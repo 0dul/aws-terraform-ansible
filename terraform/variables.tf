@@ -6,3 +6,7 @@ variable "vpc_cidr" {}
 
 # data populated by aws to get the list of available zones
 data "aws_availability_zones" "available" {}
+
+variable "cidrs" {
+  type = "map"
+}
