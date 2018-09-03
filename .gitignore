@@ -1,0 +1,9 @@
+.terraform
+*terraform.tfstate*
+# store variables that might contain personal information
+*my.auto.tfvars*
+# plan file generated when using terraform plan -out file.plan
+*.plan
+# ignore secrets
+*.pem
+*id_rsa*
