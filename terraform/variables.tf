@@ -2,3 +2,7 @@
 
 variable "aws_region" {}
 variable "aws_profile" {}
+variable "vpc_cidr" {}
+
+# data populated by aws to get the list of available zones
+data "aws_availability_zones" "available" {}
