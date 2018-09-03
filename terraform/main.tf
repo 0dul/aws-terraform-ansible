@@ -12,7 +12,7 @@ provider "aws" {
 #S3 access config
 resource "aws_iam_instance_profile" "s3_access_profile" {
   name = "s3_access"
-  role = "${aws_iam_role.s3_access_role.name}"  
+  role = "${aws_iam_role.s3_access_role.name}"
 }
 
 resource "aws_iam_role_policy" "s3_access_policy" {
@@ -35,6 +35,7 @@ EOF
 
 resource "aws_iam_role" "s3_access_role" {
   name = "s3_access_role"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -55,7 +56,7 @@ EOF
 # VPC configuration
 
 resource "aws_vpc" "wp_vpc" {
-  cidr_block = "${var.vpc_cidr}"
+  cidr_block           = "${var.vpc_cidr}"
   enable_dns_hostnames = true
   enable_dns_support   = true
 
@@ -171,4 +172,40 @@ resource "aws_subnet" "wp_rds3_subnet" {
   tags {
     Name = "wp_rds3"
   }
+}
+
+#rds subnet group
+resource "aws_db_subnet_group" "wp_rds_subnetgroup" {
+  name = "wp_rds_subnetgroup"
+
+  subnet_ids = [
+    "${aws_subnet.wp_rds1_subnet.id}",
+    "${aws_subnet.wp_rds2_subnet.id}",
+    "${aws_subnet.wp_rds3_subnet.id}",
+  ]
+
+  tags {
+    Name = "wp_rds_sng"
+  }
+}
+
+#subnet associations
+resource "aws_route_table_association" "wp_public1_assoc" {
+  subnet_id      = "${aws_subnet.wp_public1_subnet.id}"
+  route_table_id = "${aws_route_table.wp_public_rt.id}"
+}
+
+resource "aws_route_table_association" "wp_public2_assoc" {
+  subnet_id      = "${aws_subnet.wp_public2_subnet.id}"
+  route_table_id = "${aws_route_table.wp_public_rt.id}"
+}
+
+resource "aws_route_table_association" "wp_private1_assoc" {
+  subnet_id      = "${aws_subnet.wp_private1_subnet.id}"
+  route_table_id = "${aws_default_route_table.wp_private_rt.id}"
+}
+
+resource "aws_route_table_association" "wp_private2_assoc" {
+  subnet_id      = "${aws_subnet.wp_private2_subnet.id}"
+  route_table_id = "${aws_default_route_table.wp_private_rt.id}"
 }
