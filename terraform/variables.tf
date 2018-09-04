@@ -24,3 +24,7 @@ variable "elb_unhealthy_treshold" {}
 variable "elb_timeout" {}
 variable "elb_interval" {}
 variable "domain_name" {}
+variable "key_name" {}
+variable "public_key_path" {}
+variable "dev_instance_type" {}
+variable "dev_ami" {}
