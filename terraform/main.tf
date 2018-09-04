@@ -1,4 +1,8 @@
-# Terraform file to deploy the lab
+# ------
+# DEPLOY WORDPRESS INFRASTRUCTURE ON AWS
+# This shows an example of how to deploy a lab environment to Amazon Web Services
+# using terraform and configured by ansible.
+# ------
 
 # Provider configuration
 
@@ -7,7 +11,7 @@ provider "aws" {
   "profile" = "${var.aws_profile}"
 }
 
-# IAM configuration
+# ------ IAM CONFIGURATION  ------ #
 
 #S3 access config
 resource "aws_iam_instance_profile" "s3_access_profile" {
@@ -53,7 +57,7 @@ resource "aws_iam_role" "s3_access_role" {
 EOF
 }
 
-# VPC configuration
+# ------ VPC CONFIGURATION  ------ #
 
 resource "aws_vpc" "wp_vpc" {
   cidr_block           = "${var.vpc_cidr}"
@@ -210,7 +214,7 @@ resource "aws_route_table_association" "wp_private2_assoc" {
   route_table_id = "${aws_default_route_table.wp_private_rt.id}"
 }
 
-# Security groups
+# ------ SECURITY GROUPS  ------ #
 
 resource "aws_security_group" "wp_dev_sg" {
   name        = "wp_dev_sg"
@@ -302,7 +306,7 @@ resource "aws_security_group" "wp_rds_sg" {
   }
 }
 
-# Load balancer
+# ------ LOAD BALANCER  ------ #
 
 resource "aws_elb" "wp_elb" {
   name = "${var.domain_name}-elb"
@@ -335,7 +339,7 @@ resource "aws_elb" "wp_elb" {
   }
 }
 
-# VPC endpoint for S3
+# ------ VPC endpoint for S3
 resource "aws_vpc_endpoint" "wp_private-s3_endpoint" {
   vpc_id       = "${aws_vpc.wp_vpc.id}"
   service_name = "com.amazonaws.${var.aws_region}.s3"
@@ -374,7 +378,7 @@ resource "aws_s3_bucket" "code" {
   }
 }
 
-# RDS
+# ------ RDS ------ #
 
 resource "aws_db_instance" "wp_db" {
   allocated_storage      = 10
@@ -389,7 +393,7 @@ resource "aws_db_instance" "wp_db" {
   skip_final_snapshot    = true
 }
 
-# DEV SERVER
+# ------ DEV SERVER ------ #
 
 #key pair
 resource "aws_key_pair" "wp_auth" {
@@ -428,14 +432,14 @@ EOD
   }
 }
 
-# Golden ami
+# ------ GOLDEN AMI ------ #
 
 #random ami id
 resource "random_id" "golden_ami" {
   byte_length = 3
 }
 
-#AMI
+#ami
 resource "aws_ami_from_instance" "wp_golden" {
   name               = "wp_ami-${random_id.golden_ami.b64}"
   source_instance_id = "${aws_instance.wp_dev.id}"
@@ -452,7 +456,7 @@ EOT
   }
 }
 
-# Launch configuration
+# ------ LAUNCH CONFIGURATION  ------ #
 
 resource "aws_launch_configuration" "wp_lc" {
   name_prefix          = "wp_lc-"
@@ -468,7 +472,7 @@ resource "aws_launch_configuration" "wp_lc" {
   }
 }
 
-# Autoscaling group
+# ------ AUTOSCALING GROUP ------ #
 
 resource "aws_autoscaling_group" "wp_asg" {
   name                      = "asg-${aws_launch_configuration.wp_lc.id}"
@@ -498,7 +502,7 @@ resource "aws_autoscaling_group" "wp_asg" {
   }
 }
 
-# Route53
+# ------ ROUTE53 ------ #
 
 #primary zone
 resource "aws_route53_zone" "primary" {
