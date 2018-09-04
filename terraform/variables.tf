@@ -12,3 +12,15 @@ variable "cidrs" {
 }
 
 variable "local_ip" {}
+variable "lc_instance_type" {}
+variable "user_data" {}
+variable "asg_max" {}
+variable "asg_min" {}
+variable "asg_grace" {}
+variable "asg_type" {}
+variable "asg_capacity" {}
+variable "elb_healthy_treshold" {}
+variable "elb_unhealthy_treshold" {}
+variable "elb_timeout" {}
+variable "elb_interval" {}
+variable "domain_name" {}
